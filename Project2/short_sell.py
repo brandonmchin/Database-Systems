@@ -37,13 +37,14 @@ def get_trade_price(cursor, trading_symbol, trade_date):
 	# search for price of stock after 3 months, if not found, search the price of the previous date
 	print "SEARCHING FOR DATE...", trade_date
 	while(True):
-		sql = "select TRADE_PRICE from STOCK_TRADE where TRADING_SYMBOL = '%s' and TRADE_DATE = '%s' limit 1" % (trading_symbol, trade_date)
+		sql = "select TRADE_PRICE, TRADE_SIZE from STOCK_TRADE where TRADING_SYMBOL = '%s' and TRADE_DATE = '%s' limit 1" % (trading_symbol, trade_date)
 		cursor.execute(sql)
 		results = cursor.fetchall()
 
 		if len(results) > 0:
 			for row in results:
 				trade_price = row[0]
+				trade_size = row[1]
 				print "FOUND, PRICE:", trade_price
 				break
 			break
@@ -51,7 +52,7 @@ def get_trade_price(cursor, trading_symbol, trade_date):
 			trade_date = trade_date + timedelta(days=-1)
 			print "NOT FOUND, SEARCHING FOR PREVIOUS DATE...", trade_date
 
-	return trade_price			
+	return trade_price, trade_size		
 
 
 def trader_profit(cursor, expired):
@@ -69,12 +70,13 @@ def trader_profit(cursor, expired):
 		trader_id = row[1]
 		trade_type = row[2]
 		trading_symbol = row[3]
+		start_date = row[4].date()
 		due_date = row[5].date() 		# convert time to date
-		trade_price = row[6]
-		trade_size = row[7]
-		new_trade_price = get_trade_price(cursor, trading_symbol, due_date)	 	# get the price of stock after 3 months
+		# get the price and size of stock at the start of contract
+		trade_price, trade_size = get_trade_price(cursor, trading_symbol, start_date) 
+		new_trade_price, n = get_trade_price(cursor, trading_symbol, due_date)	 	# get the price of stock after 3 months
 		delta = trade_price - new_trade_price 		# calculate the change in stock price over 3 months
-		fee = row[8] * trade_price * trade_size	 	# fee is equal to the rate * price of stock * number of stocks	
+		fee = row[6] * trade_price * trade_size	 	# fee is equal to the rate * price of stock * number of stocks	
 		profit = (delta * trade_size) - fee 		# net profit is equal to (change of stock * number of stocks) - fee			
 		profits.append((contract_num, trader_id, profit)) 			# append a tuple
 	return profits
