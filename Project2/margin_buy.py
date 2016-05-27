@@ -128,11 +128,11 @@ def update(cursor):
 	profits = trader_profit(cursor, expired)
 	for contract_num, trader_id, profit in profits:
 		print "\nID: %d | Profit: %f" % (trader_id, profit) 	# print the profits of all traders whose contracts expired
-		sql = "update BROKER set net_profit = %d where contract_num = %d" % (profit, contract_num) 	# update net profit in BROKER
+		sql = "update BROKER set net_profit = %f where contract_num = %d" % (profit, contract_num) 	# update net profit in BROKER
 		cursor.execute(sql)
 		print "UPDATED BROKER CONTRACT NET PROFIT"
 
-		sql = "update TRADER set balance = balance + %d where trader_id = %d" % (profit, trader_id) # update balance in TRADER
+		sql = "update TRADER set balance = balance + %f where trader_id = %d" % (profit, trader_id) # update balance in TRADER
 		cursor.execute(sql)
 		print "UPDATED TRADER BALANCE"
 
@@ -149,7 +149,7 @@ if __name__=='__main__':
 	passwd = sys.argv[2]
 
 	# open server connection 
-	conn = MySQLdb.connect(host='localhost', user=user, passwd=passwd, db='S16336bchin')
+	conn = MySQLdb.connect(host='localhost', user=user, passwd=passwd, db='S16336team3')
 
 	cursor = conn.cursor()
 
