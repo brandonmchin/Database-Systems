@@ -75,9 +75,9 @@ def trader_profit(cursor, expired):
 		# get the price and size of stock at the start of contract
 		trade_price, trade_size = get_trade_price(cursor, trading_symbol, start_date) 
 		new_trade_price, n = get_trade_price(cursor, trading_symbol, due_date)	 	# get the price of stock after 3 months
-		delta = trade_price - new_trade_price 		# calculate the change in stock price over 3 months
+		delta = new_trade_price - trade_price 		# calculate the change in stock price over 3 months
 		fee = row[6] * trade_price * trade_size	 	# fee is equal to the rate * price of stock * number of stocks	
-		profit = (delta * trade_size) - fee 		# net profit is equal to (change of stock * number of stocks) - fee			
+		profit = (-delta * trade_size) - fee 		# net profit is equal to (change of stock * number of stocks) - fee			
 		profits.append((contract_num, trader_id, profit)) 			# append a tuple
 	return profits
 
