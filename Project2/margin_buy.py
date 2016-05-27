@@ -55,6 +55,28 @@ def get_trade_price(cursor, trading_symbol, trade_date):
 	return trade_price, trade_size		
 
 
+def is_margin_call(cursor, trading_symbol, trade_price, start_date, due_date):
+	# determine if a margin call was made
+	#
+	# return: boolean, true if margin call was made, false otherwise
+
+	# if the price of stock drops below this rate at any point, issue a margin call
+	maintenance_margin_rate = 0.25 
+	maintenance_margin = maintenance_margin_rate * trade_price
+
+	sql = "select TRADE_PRICE from STOCK_TRADE where TRADING_SYMBOL = '%s' and TRADE_DATE >= '%s' and TRADE_DATE <= '%s'" \
+			% (trading_symbol, start_date, due_date)
+	cursor.execute(sql)
+	results = cursor.fetchall()
+	for row in results:
+		price = float(row[0])
+		if price <= maintenance_margin:
+			print "MARGIN CALL MADE AT PRICE:", price
+			return True
+	print "NO MARGIN CALL MADE."
+	return False
+
+
 def trader_profit(cursor, expired):
 	# calculate the profit of traders whose contracts have expired
 	#
@@ -78,12 +100,22 @@ def trader_profit(cursor, expired):
 		trade_price, trade_size = get_trade_price(cursor, trading_symbol, start_date) 
 		new_trade_price, n = get_trade_price(cursor, trading_symbol, due_date)	 	# get the price of stock after 3 months
 		delta = new_trade_price - trade_price 		# calculate the change in stock price over 3 months	
-		
+
 		loan = trade_price * trade_size * (1 - margin) 	# broker covers the remaining 70%
 		fee = float(row[6]) * loan	 	# broker fee trader must pay to take out the loan, equal to rate * loan	
 		down_pay = (margin * trade_price * trade_size) + fee 	# initial trader down payment plus the fee
 
-		margin_call_price = 0.0 
+		# determine if a margin call was made
+		margin_call = is_margin_call(cursor, trading_symbol, trade_price, start_date, due_date)
+
+		margin_call_rate = 0.2  	# if a margin call is made, trader must pay an additional 20% the original loan
+		if margin_call:
+			margin_call_price = loan * margin_call_rate 
+		else:
+			margin_call_price = 0.0	
+
+		print "ADDITIONAL PAYMENT:", margin_call_price
+
 		profit = ((trade_price + delta) * trade_size) - down_pay - loan - margin_call_price
 		profits.append((contract_num, trader_id, profit)) 			# append a tuple
 	
