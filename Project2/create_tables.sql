@@ -33,7 +33,21 @@ create table TRADER (
 	balance decimal(50,2) default null,
 	primary key(trader_id));
 
+alter table BROKER add foreign key (trader_id) references TRADER (trader_id);
+
+
 /* Populate tables */
+insert TRADER values (0, 'peter', 100000);
+insert TRADER values (1, 'anthony', 250000);
+insert TRADER values (2, 'sarah', 115000);
+insert TRADER values (3, 'john', 75000);
+insert TRADER values (4, 'potter', 195000);
+insert TRADER values (5, 'alex', 500000);
+insert TRADER values (6, 'shaun', 195000);
+insert TRADER values (7, 'mary', 195000);
+insert TRADER values (8, 'george', 195000);
+insert TRADER values (9, 'steve', 195000);
+
 -- insert BROKER values (0, 0, 'short', 'BHN', '2016-02-08 09:00:11', '2016-05-08 00:00:00', 66.0000, 8700, 0.02, null);
 -- insert BROKER values (1, 1, 'short', 'BGA', '2016-02-18 09:20:42', '2016-05-18 00:00:00', 54.8490, 2600, 0.03, null);
 -- insert BROKER values (2, 2, 'short', 'AEW', '2016-03-24 09:19:08', '2016-06-24 00:00:00', 74.8360, 900, 0.04, null);
@@ -45,10 +59,8 @@ insert BROKER values (1, 1, 'short', 'BGA', '2016-02-18 09:20:42', '2016-05-18 0
 insert BROKER values (2, 2, 'short', 'AEW', '2016-03-24 09:19:08', '2016-06-24 00:00:00', 0.04, null);
 insert BROKER values (3, 3, 'short', 'ARM', '2016-02-08 09:11:42', '2016-05-08 00:00:00', 0.01, null);
 insert BROKER values (4, 4, 'short', 'AQO', '2016-03-18 09:16:50', '2016-06-18 00:00:00', 0.05, null);
-
-
-insert TRADER values (0, 'peter', 100000);
-insert TRADER values (1, 'anthony', 250000);
-insert TRADER values (2, 'sarah', 115000);
-insert TRADER values (3, 'john', 75000);
-insert TRADER values (4, 'potter', 195000);
+insert BROKER values (5, 5, 'long', 'BHN', '2016-02-08 09:00:11', '2016-05-08 00:00:00', 0.02, null);
+insert BROKER values (6, 6, 'long', 'BGA', '2016-02-18 09:20:42', '2016-05-18 00:00:00', 0.03, null);
+insert BROKER values (7, 7, 'long', 'AEW', '2016-03-24 09:19:08', '2016-06-24 00:00:00', 0.04, null);
+insert BROKER values (8, 8, 'long', 'ARM', '2016-02-08 09:11:42', '2016-05-08 00:00:00', 0.01, null);
+insert BROKER values (9, 9, 'long', 'AQO', '2016-03-18 09:16:50', '2016-06-18 00:00:00', 0.05, null);
